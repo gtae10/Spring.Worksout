@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>내 루틴 그룹</title>
+</head>
+
+<body>
+<a th:href="@{/}" style="font-size: 25px; font-weight: bold; text-decoration: none;">RoutineManager</a>
+<hr>
+<h2 th:text="${session.loginMember.name} + '님의 루틴 그룹'"></h2>
+
+<a href="/routinegroup/new">새 그룹 만들기</a>
+<br><br>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>그룹 이름</th>
+        <th>관리</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each="group : ${groups}">
+        <td>
+            <a th:href="@{/routine/list(groupId=${group.id})}"
+               th:text="${group.title}"></a>
+        </td>
+        <td>
+            <form th:action="@{/routinegroup/delete}" method="post">
+                <input type="hidden" name="id" th:value="${group.id}">
+                <button type="submit">삭제</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>내 루틴 목록</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 70%;
+            margin: 20px auto;
+        }
+        th, td {
+            border: 1px solid #888;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        h2 {
+            text-align: center;
+        }
+        .btn {
+            padding: 5px 10px;
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #c9302c;
+        }
+    </style>
+</head>
+<body>
+<a th:href="@{/}" style="font-size: 25px; font-weight: bold; text-decoration: none;">RoutineManager</a>
+<hr>
+<h2 th:text="${session.loginMember.name} + '님의 운동 루틴'"></h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>운동명</th>
+        <th>부위</th>
+        <th>세트</th>
+        <th>반복</th>
+        <th>무게(kg)</th>
+        <th>삭제</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="r : ${routines}">
+        <td th:text="${r.workout}"></td>
+        <td th:text="${r.part}"></td>
+        <td th:text="${r.sets}"></td>
+        <td th:text="${r.reps}"></td>
+        <td th:text="${r.weight}"></td>
+        <td>
+            <form th:action="@{/routine/delete/{id}/{groupId}(id=${r.id}, groupId=${groupId})}" method="post">
+            <button type="submit" class="btn">삭제</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<div style="text-align:center;">
+    <form action="/main" method="get">
+        <button type="submit">메인으로 돌아가기</button>
+    </form>
+</div>
+
+</body>
+</html>

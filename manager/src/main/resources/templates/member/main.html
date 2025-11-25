@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>메인 페이지</title>
+</head>
+<body>
+<div class="container">
+    <h2>운동 루틴 관리 메인</h2>
+    <p th:text="${session.loginMember.name} + '님'"></p>
+    <form action="/member/logout" method="post">
+        <button type="submit">로그아웃</button>
+    </form>
+    <form action="/routine/my" method="get">
+        <button type="submit">루틴 설정하러 가기</button>
+    </form>
+    <form th:action="@{/routinegroup/list}" method="get">
+        <button type="submit">내 루틴 보기</button>
+    </form>
+    <form action="/calender/calender" method="get">
+        <button type="submit">기록</button>
+    </form>
+</div>
+</body>
+</html>

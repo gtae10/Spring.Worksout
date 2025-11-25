@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>운동 루틴 설정</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .category { text-align: center; margin: 20px; }
+        .category label { margin: 0 10px; font-weight: bold; }
+        .search-box { text-align: center; margin-bottom: 15px; }
+        table { border-collapse: collapse; width: 80%; margin: 0 auto; }
+        th, td { border: 1px solid #aaa; padding: 10px; text-align: center; }
+        th { background-color: #f2f2f2; }
+        .btn {
+            padding: 6px 12px;
+            background-color: #0275d8;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .btn:hover { background-color: #025aa5; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6);
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            width: 350px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 22px;
+            cursor: pointer;
+        }
+        .close:hover { color: black; }
+    </style>
+</head>
+
+<body>
+<a th:href="@{/}" style="font-size: 25px; font-weight: bold; text-decoration: none;">RoutineManager</a>
+<hr>
+<h2 style="text-align:center;">운동 루틴 설정</h2>
+
+<div class="search-box">
+    <input type="text" id="searchInput" placeholder="운동명을 입력하세요" onkeyup="searchExercise()">
+</div>
+
+<div class="category">
+
+    <label>
+        <input type="radio" name="bodyPart" value="전체"
+               th:onclick="|location.href='@{/routine/list(bodyPart='전체', groupId=${groupId})}'|">
+        전체
+    </label>
+    <label>
+        <input type="radio" name="bodyPart" value="가슴"
+               th:onclick="|location.href='@{/routine/list(bodyPart='가슴', groupId=${groupId})}'|">
+        가슴
+    </label>
+    <label>
+        <input type="radio" name="bodyPart" value="등"
+               th:onclick="|location.href='@{/routine/list(bodyPart='등', groupId=${groupId})}'|">
+        등
+    </label>
+    <label>
+        <input type="radio" name="bodyPart" value="어깨"
+               th:onclick="|location.href='@{/routine/list(bodyPart='어깨', groupId=${groupId})}'|">
+        어깨
+    </label>
+    <label>
+        <input type="radio" name="bodyPart" value="팔"
+               th:onclick="|location.href='@{/routine/list(bodyPart='팔', groupId=${groupId})}'|">
+        팔
+    </label>
+    <label>
+        <input type="radio" name="bodyPart" value="하체"
+               th:onclick="|location.href='@{/routine/list(bodyPart='하체', groupId=${groupId})}'|">
+        하체
+    </label>
+
+</div>
+
+<table id="exerciseTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>부위</th>
+        <th>운동명</th>
+        <th>추가</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="w : ${worksout}" class="exercise-row">
+        <td th:text="${w.id}"></td>
+        <td th:text="${w.part}"></td>
+        <td th:text="${w.workout}" class="exercise-name"></td>
+        <td>
+            <button type="button" class="btn"
+                    th:data-id="${w.id}"
+                    th:data-name="${w.workout}"
+                    onclick="openModal(this)">추가</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<div id="routineModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3 id="modalTitle">운동 등록</h3>
+
+        <!-- ✅ 그룹 ID 포함 -->
+        <form th:action="@{/routine/new/{groupId}(groupId=${groupId})}" method="post">
+            <input type="hidden" name="worksOut.id" id="modalExerciseId">
+
+            <p>운동명: <input type="text" id="modalExerciseName" readonly></p>
+            <p>세트: <input type="number" name="sets" required></p>
+            <p>반복: <input type="number" name="reps" required></p>
+            <p>무게(kg): <input type="number" name="weight"></p>
+
+            <button type="submit" class="btn">등록</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openModal(btn) {
+        const modal = document.getElementById("routineModal");
+        document.getElementById("modalExerciseId").value = btn.getAttribute("data-id");
+        document.getElementById("modalExerciseName").value = btn.getAttribute("data-name");
+        document.getElementById("modalTitle").textContent = btn.getAttribute("data-name") + " 루틴 등록";
+        modal.style.display = "block";
+    }
+
+    function closeModal() {
+        document.getElementById("routineModal").style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById("routineModal");
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    };
+
+    function searchExercise() {
+        const input = document.getElementById("searchInput").value.toLowerCase();
+        const rows = document.querySelectorAll(".exercise-row");
+        rows.forEach(row => {
+            const name = row.querySelector(".exercise-name").innerText.toLowerCase();
+            row.style.display = name.includes(input) ? "" : "none";
+        });
+    }
+</script>
+</body>
+</html>

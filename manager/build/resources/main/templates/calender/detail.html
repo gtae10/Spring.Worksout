@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>운동 기록</title>
+
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { border-collapse: collapse; width: 70%; margin: 20px auto; }
+        th, td { border: 1px solid #aaa; padding: 10px; text-align: center; }
+        th { background-color: #f2f2f2; }
+        h2 { text-align: center; }
+        .btn {
+            padding: 6px 12px;
+            background-color: #0275d8;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .btn:hover { background-color: #025aa5; }
+
+        .home {
+            display: block;
+            text-align: center;
+            margin: 20px;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+<a class="home" th:href="@{/}">RoutineManager</a>
+<hr>
+
+<h2 th:text="|${session.loginMember.name}님의 ${date} 운동 루틴|"></h2>
+
+<h3 style="text-align:center;"
+    th:text="'루틴 그룹: ' + ${calender.routineGroup.title}"></h3>
+
+<table>
+    <thead>
+    <tr>
+        <th>운동명</th>
+        <th>부위</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="r : ${calender.routineGroup.routines}">
+        <td th:text="${r.workout}"></td>
+        <td th:text="${r.part}"></td>
+    </tr>
+    </tbody>
+</table>
+
+
+<h3 style="text-align:center;">운동 기록</h3>
+
+<table border="1" style="margin:auto; width:70%; text-align:center;">
+    <thead>
+    <tr>
+        <th>운동명</th><th>부위</th><th>세트</th><th>반복</th><th>무게</th><th>수정</th><th>삭제</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="r : ${calender.routineGroup.routines}">
+        <form th:action="@{/routine/update}" method="post">
+            <input type="hidden" name="id" th:value="${r.id}">
+            <input type="hidden" name="date" th:value="${date}">
+            <input type="hidden" name="groupId" th:value="${calender.routineGroup.id}">
+
+            <td th:text="${r.workout}"></td>
+            <td th:text="${r.part}"></td>
+            <td><input type="number" name="sets" th:value="${r.sets}" required></td>
+            <td><input type="number" name="reps" th:value="${r.reps}" required></td>
+            <td><input type="number" name="weight" th:value="${r.weight}"></td>
+            <td><button type="submit">수정</button></td>
+        </form>
+
+        <td>
+            <form th:action="@{/routine/delete/{id}/{groupId}(id=${r.id},groupId=${calender.routineGroup.id})}" method="post">
+                <button type="submit" style="color:red;">삭제</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<br>
+<form th:action="@{/routine/list}" method="get">
+    <input type="hidden" name="groupId" th:value="${calender.routineGroup.id}">
+    <button type="submit">루틴 추가하기</button>
+</form>
+
+<h3 style="text-align:center;">기록 추가</h3>
+
+<form th:action="@{/calender/record/save}" method="post" style="text-align:center;">
+    <input type="hidden" name="calenderId" th:value="${calender.id}"/>
+
+    운동명:
+    <input type="text" name="workout" required>
+    세트:
+    <input type="number" name="sets" required>
+    반복:
+    <input type="number" name="reps" required>
+    무게(kg):
+    <input type="number" name="weight">
+
+    <button type="submit" class="btn">추가</button>
+</form>
+
+</body>
+</html>

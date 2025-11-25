@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 및 회원가입</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 300px;
+        }
+        input {
+            width: 90%;
+            padding: 8px;
+            margin: 8px 0;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #0275d8;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #025aa5; }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Login</h1>
+
+    <!-- ✅ 스프링 시큐리티는 name="username", name="password" 인식 -->
+    <form th:action="@{/login}" method="post">
+        <p>ID: <input type="text" name="username" placeholder="ID를 입력하세요" required></p>
+        <p>PW: <input type="password" name="password" placeholder="PW를 입력하세요" required></p>
+        <button type="submit">로그인</button>
+    </form>
+
+    <button onclick="location.href='/member/new'">회원가입</button>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('success')) {
+        alert('환영합니다!');
+        location.href = '/main'; // ✅ 로그인 성공 후 main 이동
+    } else if (params.has('error')) {
+        alert('아이디 또는 비밀번호가 올바르지 않습니다.');
+    }
+    /*]]>*/
+</script>
+
+</body>
+</html>
