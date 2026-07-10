@@ -30,7 +30,7 @@ public class RoutineGroupController {
     @GetMapping("/list")
     public String list(HttpSession session, Model model) {
         Member loginMember = (Member)session.getAttribute("loginMember");
-        if(loginMember == null) return "redirect:/";
+        if(loginMember == null) return "redirect:/login";
 
         model.addAttribute("groups", routineGroupService.findByMember(loginMember));
         return "routinegroup/routinegroupList"; // ✅ 폴더/파일 경로
@@ -66,7 +66,7 @@ public class RoutineGroupController {
     @PostMapping("/new")
     public String create(@RequestParam String title, HttpSession session) {
         Member loginMember = (Member)session.getAttribute("loginMember");
-        if(loginMember == null) return "redirect:/";
+        if(loginMember == null) return "redirect:/login";
 
         RoutineGroup routineGroup = new RoutineGroup();
         routineGroup.setTitle(title);

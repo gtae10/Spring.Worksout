@@ -94,7 +94,7 @@ public class CalenderController {
         Calender calender =  calendarService.findByMemberAndDate(member, LocalDate.parse(date));
 
         model.addAttribute("calender",calender);
-        model.addAttribute("records.",workOutRecordService.findByCalender(calender));
+        model.addAttribute("records",workOutRecordService.findByCalender(calender));
         model.addAttribute("date",date);
         return "calender/detail";
     }
@@ -109,7 +109,7 @@ public class CalenderController {
         record.setWorkOut(workout);
         record.setReps(reps);
         record.setSets(sets);
-        record.setWeight(weight);
+        record.setWeight(weight != null ? weight : 0);
         record.setCalender(calendarService.findById(calenderId));
 
         workOutRecordService.save(record);

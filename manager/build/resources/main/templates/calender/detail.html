@@ -2,114 +2,112 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>운동 기록</title>
-
-    <style>
-        body { font-family: Arial, sans-serif; }
-        table { border-collapse: collapse; width: 70%; margin: 20px auto; }
-        th, td { border: 1px solid #aaa; padding: 10px; text-align: center; }
-        th { background-color: #f2f2f2; }
-        h2 { text-align: center; }
-        .btn {
-            padding: 6px 12px;
-            background-color: #0275d8;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .btn:hover { background-color: #025aa5; }
-
-        .home {
-            display: block;
-            text-align: center;
-            margin: 20px;
-            font-size: 25px;
-            font-weight: bold;
-        }
-
-    </style>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 
-<a class="home" th:href="@{/}">RoutineManager</a>
-<hr>
+<div th:replace="~{fragments/layout :: topbar(title=${date}, backUrl=@{/calender/calender})}"></div>
+<div th:replace="~{fragments/layout :: navbar(active='record')}"></div>
 
-<h2 th:text="|${session.loginMember.name}님의 ${date} 운동 루틴|"></h2>
+<div class="page">
 
-<h3 style="text-align:center;"
-    th:text="'루틴 그룹: ' + ${calender.routineGroup.title}"></h3>
+    <h2 class="section-title" style="margin-top: 14px;"
+        th:text="${session.loginMember.name} + '님의 운동 루틴'">운동 루틴</h2>
+    <p class="section-sub" th:text="'루틴 그룹 · ' + ${calender.routineGroup.title}">루틴 그룹</p>
 
-<table>
-    <thead>
-    <tr>
-        <th>운동명</th>
-        <th>부위</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="r : ${calender.routineGroup.routines}">
-        <td th:text="${r.workout}"></td>
-        <td th:text="${r.part}"></td>
-    </tr>
-    </tbody>
-</table>
+    <!-- 이 날의 루틴 구성 -->
+    <div class="card" style="padding: 4px 12px;">
+        <div class="exercise-row" th:each="r : ${calender.routineGroup.routines}">
+            <span class="exercise-avatar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 7v10M18 7v10M2 12h4M18 12h4M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+            <div class="exercise-info">
+                <div class="exercise-name" th:text="${r.workout}">운동명</div>
+                <div class="exercise-part" th:text="${r.part}">부위</div>
+            </div>
+        </div>
+        <div th:if="${#lists.isEmpty(calender.routineGroup.routines)}" class="empty-state">등록된 운동이 없어요.</div>
+    </div>
 
+    <!-- 세트 / 무게 수정 -->
+    <h2 class="section-title">세트 · 무게 수정</h2>
+    <div class="card" style="padding: 10px 12px;">
+        <div class="record-head">
+            <span>운동명</span><span>세트</span><span>반복</span><span>무게</span><span></span><span></span>
+        </div>
+        <div class="record-row" th:each="r : ${calender.routineGroup.routines}">
+            <form th:action="@{/routine/update}" method="post" style="display:contents;">
+                <input type="hidden" name="id" th:value="${r.id}">
+                <input type="hidden" name="date" th:value="${date}">
+                <input type="hidden" name="groupId" th:value="${calender.routineGroup.id}">
 
-<h3 style="text-align:center;">운동 기록</h3>
-
-<table border="1" style="margin:auto; width:70%; text-align:center;">
-    <thead>
-    <tr>
-        <th>운동명</th><th>부위</th><th>세트</th><th>반복</th><th>무게</th><th>수정</th><th>삭제</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="r : ${calender.routineGroup.routines}">
-        <form th:action="@{/routine/update}" method="post">
-            <input type="hidden" name="id" th:value="${r.id}">
-            <input type="hidden" name="date" th:value="${date}">
-            <input type="hidden" name="groupId" th:value="${calender.routineGroup.id}">
-
-            <td th:text="${r.workout}"></td>
-            <td th:text="${r.part}"></td>
-            <td><input type="number" name="sets" th:value="${r.sets}" required></td>
-            <td><input type="number" name="reps" th:value="${r.reps}" required></td>
-            <td><input type="number" name="weight" th:value="${r.weight}"></td>
-            <td><button type="submit">수정</button></td>
-        </form>
-
-        <td>
-            <form th:action="@{/routine/delete/{id}/{groupId}(id=${r.id},groupId=${calender.routineGroup.id})}" method="post">
-                <button type="submit" style="color:red;">삭제</button>
+                <span class="record-name" th:text="${r.workout}">운동명</span>
+                <input class="form-input" type="number" name="sets" th:value="${r.sets}" required>
+                <input class="form-input" type="number" name="reps" th:value="${r.reps}" required>
+                <input class="form-input" type="number" name="weight" th:value="${r.weight}">
+                <button type="submit" class="btn-icon" title="저장">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
             </form>
-        </td>
-    </tr>
-    </tbody>
-</table>
+            <form th:action="@{/routine/delete/{id}/{groupId}(id=${r.id},groupId=${calender.routineGroup.id})}" method="post" style="display:contents;">
+                <button type="submit" class="btn-icon" title="삭제">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+            </form>
+        </div>
+        <div th:if="${#lists.isEmpty(calender.routineGroup.routines)}" class="empty-state">수정할 운동이 없어요.</div>
+    </div>
 
-<br>
-<form th:action="@{/routine/list}" method="get">
-    <input type="hidden" name="groupId" th:value="${calender.routineGroup.id}">
-    <button type="submit">루틴 추가하기</button>
-</form>
+    <a class="btn btn-secondary btn-block" style="margin-top: 12px;"
+       th:href="@{/routine/list(groupId=${calender.routineGroup.id})}">+ 루틴에 운동 추가하기</a>
 
-<h3 style="text-align:center;">기록 추가</h3>
+    <!-- 오늘 실제로 기록한 세트 로그 -->
+    <h2 class="section-title">오늘 기록한 세트</h2>
+    <div class="card" style="padding: 4px 12px;">
+        <div class="log-row" th:each="rec : ${records}">
+            <div class="exercise-info">
+                <div class="exercise-name" th:text="${rec.workOut}">운동명</div>
+                <div class="exercise-part"
+                     th:text="${rec.sets} + '세트 · ' + ${rec.reps} + '회' + (${rec.weight} > 0 ? ' · ' + ${rec.weight} + 'kg' : '')">
+                    3세트 · 15회
+                </div>
+            </div>
+        </div>
+        <div th:if="${#lists.isEmpty(records)}" class="empty-state">아직 기록한 세트가 없어요. 아래에서 추가해보세요.</div>
+    </div>
 
-<form th:action="@{/calender/record/save}" method="post" style="text-align:center;">
-    <input type="hidden" name="calenderId" th:value="${calender.id}"/>
+    <!-- 기록 추가 -->
+    <h2 class="section-title">기록 추가</h2>
+    <div class="card">
+        <form th:action="@{/calender/record/save}" method="post">
+            <input type="hidden" name="calenderId" th:value="${calender.id}"/>
 
-    운동명:
-    <input type="text" name="workout" required>
-    세트:
-    <input type="number" name="sets" required>
-    반복:
-    <input type="number" name="reps" required>
-    무게(kg):
-    <input type="number" name="weight">
+            <div class="form-group">
+                <label class="form-label">운동명</label>
+                <input class="form-input" type="text" name="workout" placeholder="예: 벤치프레스" required>
+            </div>
+            <div class="form-group" style="display:flex; gap:8px;">
+                <div style="flex:1;">
+                    <label class="form-label">세트</label>
+                    <input class="form-input" type="number" name="sets" required>
+                </div>
+                <div style="flex:1;">
+                    <label class="form-label">반복</label>
+                    <input class="form-input" type="number" name="reps" required>
+                </div>
+                <div style="flex:1;">
+                    <label class="form-label">무게(kg)</label>
+                    <input class="form-input" type="number" name="weight">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">추가</button>
+        </form>
+    </div>
 
-    <button type="submit" class="btn">추가</button>
-</form>
+</div>
 
 </body>
 </html>

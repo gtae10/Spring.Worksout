@@ -2,26 +2,33 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>루틴선택</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>루틴 선택</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
-<body>
-<a th:href="@{/}" style="font-size: 25px; font-weight: bold; text-decoration: none;">RoutineManager</a>
-<hr>
+<body class="no-nav">
 
-<h2 th:text="|선택한 날짜: ${date}|"></h2>
+<div th:replace="~{fragments/layout :: topbar(title='루틴 선택', backUrl=@{/calender/calender})}"></div>
 
-<form th:action="@{/calender/assign}" method="post">
-    <input type="hidden" name="date" th:value="${date}">
-    <label>루틴 선택:
-        <select name="groupId" required>
-            <option th:each="g : ${groups}" th:value="${g.id}" th:text="${g.title}"></option>
-        </select>
-    </label>
-    <button type="submit">선택</button>
-</form>
-    <a th:href="@{/routinegroup/new}">
-        <button type="button">새 루틴 생성</button>
-    </a>
+<div class="page" style="padding-top: 8px;">
+
+    <p class="section-sub" th:text="'선택한 날짜: ' + ${date}" style="margin-top: 8px;">선택한 날짜</p>
+
+    <form th:action="@{/calender/assign}" method="post">
+        <input type="hidden" name="date" th:value="${date}">
+        <div class="form-group">
+            <label class="form-label">루틴 그룹</label>
+            <select name="groupId" class="form-select" required>
+                <option th:each="g : ${groups}" th:value="${g.id}" th:text="${g.title}"></option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">이 루틴으로 배정</button>
+    </form>
+
+    <a th:href="@{/routinegroup/new}" class="btn btn-secondary btn-block" style="margin-top: 10px;">+ 새 루틴 생성</a>
+
+</div>
 
 <script>
     const urlParams = new URLSearchParams(location.search);

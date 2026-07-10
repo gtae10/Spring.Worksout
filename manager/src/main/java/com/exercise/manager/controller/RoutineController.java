@@ -75,9 +75,14 @@
         @GetMapping("/group/{groupId}")
         public String viewRoutineGroup(@PathVariable Long groupId, Model model, HttpSession session) {
             Member loginMember = (Member) session.getAttribute("loginMember");
+            if (loginMember == null) return "redirect:/login";
+
+            RoutineGroup routineGroup = routineGroupService.findById(groupId);
+
             model.addAttribute("routines", routineService.findByRoutineGroup(groupId));
             model.addAttribute("groupId", groupId);
-            if (loginMember == null) return "redirect:/";
+            model.addAttribute("groupTitle", routineGroup.getTitle());
+            model.addAttribute("bodyParts", routineGroup.getDistinctParts());
             return "routine/worksoutList";
         }
 

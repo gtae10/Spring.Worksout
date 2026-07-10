@@ -2,40 +2,47 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>내 루틴 그룹</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
-
 <body>
-<a th:href="@{/}" style="font-size: 25px; font-weight: bold; text-decoration: none;">RoutineManager</a>
-<hr>
-<h2 th:text="${session.loginMember.name} + '님의 루틴 그룹'"></h2>
 
-<a href="/routinegroup/new">새 그룹 만들기</a>
-<br><br>
+<div th:replace="~{fragments/layout :: topbar(title=${session.loginMember.name} + '님의 루틴', backUrl=@{/member/main})}"></div>
+<div th:replace="~{fragments/layout :: navbar(active='menu')}"></div>
 
-<table border="1">
-    <thead>
-    <tr>
-        <th>그룹 이름</th>
-        <th>관리</th>
-    </tr>
-    </thead>
+<div class="page">
 
-    <tbody>
-    <tr th:each="group : ${groups}">
-        <td>
-            <a th:href="@{/routine/list(groupId=${group.id})}"
-               th:text="${group.title}"></a>
-        </td>
-        <td>
-            <form th:action="@{/routinegroup/delete}" method="post">
-                <input type="hidden" name="id" th:value="${group.id}">
-                <button type="submit">삭제</button>
+    <div th:if="${#lists.isEmpty(groups)}" class="empty-state">
+        아직 만든 루틴 그룹이 없어요.<br>새 그룹을 만들고 운동을 추가해보세요.
+    </div>
+
+    <div class="routine-grid" style="margin-top: 16px;">
+        <div class="card routine-card" th:each="group : ${groups}">
+            <a th:href="@{/routine/group/{groupId}(groupId=${group.id})}" style="display:flex; align-items:center; gap:14px; flex:1; min-width:0;">
+                <span class="routine-card-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" fill="currentColor"/></svg>
+                </span>
+                <div class="routine-card-body">
+                    <div class="routine-card-title" th:text="${group.title}">루틴 그룹</div>
+                    <span class="tag" th:if="${!group.bodyParts.isEmpty()}" th:text="${group.bodyParts}">부위</span>
+                    <span class="routine-card-meta" th:if="${group.bodyParts.isEmpty()}"
+                          th:text="${group.routines.size()} + '개 운동'">0개 운동</span>
+                </div>
+            </a>
+            <!-- ✅ 기존에는 id 없이 /routinegroup/delete 로 전송되어 404가 나던 버그를 수정함 -->
+            <form th:action="@{/routinegroup/delete/{id}(id=${group.id})}" method="post">
+                <button type="submit" class="btn-icon" title="삭제">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
             </form>
-        </td>
-    </tr>
-    </tbody>
-</table>
+        </div>
+    </div>
+
+    <a class="btn btn-primary btn-block" style="margin-top: 16px;" th:href="@{/routinegroup/new}">+ 새 그룹 만들기</a>
+
+</div>
 
 </body>
 </html>

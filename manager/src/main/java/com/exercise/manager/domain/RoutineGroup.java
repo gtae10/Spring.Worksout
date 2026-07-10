@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class RoutineGroup {
@@ -53,6 +54,24 @@ public class RoutineGroup {
 
     public void setRoutines(List<Routine> routines) {
         this.routines = routines;
+    }
+
+    // 화면 표시용: 이 그룹에 포함된 운동 부위를 중복 없이 콤마로 이어붙임 (예: "어깨, 삼두")
+    public String getBodyParts() {
+        return routines.stream()
+                .map(Routine::getPart)
+                .filter(p -> p != null && !p.isBlank())
+                .distinct()
+                .collect(Collectors.joining(", "));
+    }
+
+    // 화면 표시용: 이 그룹에 포함된 운동 부위를 중복 없이 리스트로 반환 (부위 태그 pill 렌더링용)
+    public List<String> getDistinctParts() {
+        return routines.stream()
+                .map(Routine::getPart)
+                .filter(p -> p != null && !p.isBlank())
+                .distinct()
+                .collect(Collectors.toList());
     }
 
 }

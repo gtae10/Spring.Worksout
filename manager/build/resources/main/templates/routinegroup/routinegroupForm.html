@@ -2,21 +2,24 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>루틴 그룹 생성</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>새 루틴 그룹</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
-<body>
-<a th:href="@{/}" style="font-size: 25px; font-weight: bold; text-decoration: none;">RoutineManager</a>
-<hr>
-<h2>새 루틴 그룹 생성</h2>
+<body class="no-nav">
 
-<form action="/routinegroup/new" method="post">
-    <label>그룹 이름</label>
-    <input type="text" name="title" required>
-    <button type="submit">생성</button>
-</form>
+<div th:replace="~{fragments/layout :: topbar(title='새 루틴 그룹', backUrl=@{/member/main})}"></div>
 
-<br>
-<a href="/routinegroup/list">← 목록으로</a>
+<div class="page" style="padding-top: 8px;">
+    <form action="/routinegroup/new" method="post">
+        <div class="form-group">
+            <label class="form-label">그룹 이름</label>
+            <input class="form-input" type="text" name="title" placeholder="예: 올라잇 어깨" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">만들기</button>
+    </form>
+</div>
 
 </body>
 </html>

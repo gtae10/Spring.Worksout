@@ -3,8 +3,11 @@ package com.exercise.manager.controller;
 import com.exercise.manager.domain.Member;
 import com.exercise.manager.repository.MemberRepository;
 import com.exercise.manager.service.MemberService;
+import com.exercise.manager.service.RoutineGroupService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,13 +19,16 @@ public class MemberController {
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
+    private final RoutineGroupService routineGroupService;
 
     public MemberController(PasswordEncoder passwordEncoder,
                             MemberRepository memberRepository,
-                            MemberService memberService) {
+                            MemberService memberService,
+                            RoutineGroupService routineGroupService) {
         this.passwordEncoder = passwordEncoder;
         this.memberRepository = memberRepository;
         this.memberService = memberService;
+        this.routineGroupService = routineGroupService;
     }
 
     @GetMapping("/login")
@@ -31,7 +37,11 @@ public class MemberController {
     }
 
     @GetMapping("/member/main")
-    public String main() {
+    public String main(HttpSession session, Model model) {
+        Member loginMember = (Member) session.getAttribute("loginMember");
+        if (loginMember == null) return "redirect:/login";
+
+        model.addAttribute("groups", routineGroupService.findByMember(loginMember));
         return "member/main";
     }
 
