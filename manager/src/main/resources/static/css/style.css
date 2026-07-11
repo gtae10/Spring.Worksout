@@ -479,3 +479,45 @@ h1, h2, h3, p { margin: 0; }
 .log-row:last-child { border-bottom: none; }
 .log-row .exercise-name { font-size: 14px; }
 .log-row .exercise-part { margin-top: 3px; }
+
+/* ---------- Routine set detail (routine/routineDetail) ---------- */
+.set-row {
+  display: grid;
+  grid-template-columns: 40px 1fr 1fr 34px 34px 34px;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--border);
+}
+.set-row:last-child { border-bottom: none; }
+.set-row.completed { background: var(--accent-soft); border-radius: var(--radius-sm); }
+.set-row .form-input { padding: 8px; font-size: 13px; text-align: center; }
+.set-badge {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 12px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.set-row.completed .set-badge { background: var(--accent); color: #fff; }
+.set-head {
+  display: grid;
+  grid-template-columns: 40px 1fr 1fr 34px 34px 34px;
+  gap: 8px;
+  padding: 0 4px 8px;
+  font-size: 11px;
+  color: var(--text-faint);
+  font-weight: 700;
+}
+
+.btn-icon.toggle-done.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.add-set-row {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 4px 4px;
+}

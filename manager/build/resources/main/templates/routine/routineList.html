@@ -40,10 +40,16 @@
             </span>
             <div class="exercise-info">
                 <div class="exercise-name" th:text="${w.workout}">운동명</div>
-                <div class="exercise-part" th:text="${w.part}">부위</div>
+                <div class="exercise-part" th:if="${lastUsed[w.id] == null}" th:text="${w.part}">부위</div>
+                <div class="exercise-part" th:if="${lastUsed[w.id] != null}"
+                     th:text="${w.part} + ' · 지난번 ' + ${lastUsed[w.id].weight} + 'kg × ' + ${lastUsed[w.id].reps} + '회'">부위 · 지난번 기록</div>
             </div>
             <button type="button" class="btn-icon"
-                    th:data-id="${w.id}" th:data-name="${w.workout}" onclick="openModal(this)">
+                    th:data-id="${w.id}" th:data-name="${w.workout}"
+                    th:data-sets="${lastUsed[w.id] != null} ? ${lastUsed[w.id].sets} : ''"
+                    th:data-reps="${lastUsed[w.id] != null} ? ${lastUsed[w.id].reps} : ''"
+                    th:data-weight="${lastUsed[w.id] != null} ? ${lastUsed[w.id].weight} : ''"
+                    onclick="openModal(this)">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
             </button>
         </div>
@@ -68,15 +74,15 @@
             </div>
             <div class="form-group">
                 <label class="form-label">세트</label>
-                <input class="form-input" type="number" name="sets" min="1" required>
+                <input class="form-input" type="number" id="modalSets" name="sets" min="1" required>
             </div>
             <div class="form-group">
                 <label class="form-label">반복</label>
-                <input class="form-input" type="number" name="reps" min="1" required>
+                <input class="form-input" type="number" id="modalReps" name="reps" min="1" required>
             </div>
             <div class="form-group">
                 <label class="form-label">무게(kg)</label>
-                <input class="form-input" type="number" name="weight" step="0.5" min="0">
+                <input class="form-input" type="number" id="modalWeight" name="weight" step="0.5" min="0">
             </div>
 
             <button type="submit" class="btn btn-primary btn-block">등록</button>
@@ -90,6 +96,12 @@
         document.getElementById("modalExerciseId").value = btn.getAttribute("data-id");
         document.getElementById("modalExerciseName").value = btn.getAttribute("data-name");
         document.getElementById("modalTitle").textContent = btn.getAttribute("data-name") + " 루틴 등록";
+
+        // 지난번에 이 운동에 썼던 세트/반복/무게가 있으면 기본값으로 채워줌
+        document.getElementById("modalSets").value = btn.getAttribute("data-sets") || "";
+        document.getElementById("modalReps").value = btn.getAttribute("data-reps") || "";
+        document.getElementById("modalWeight").value = btn.getAttribute("data-weight") || "";
+
         modal.style.display = "block";
     }
 

@@ -3,6 +3,10 @@ package com.exercise.manager.domain;
 import com.exercise.manager.repository.RoutineGroupRepository;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 @Entity
 public class Routine {
 
@@ -28,6 +32,30 @@ public class Routine {
     @JoinColumn(name = "routine_group_id")
     private RoutineGroup routineGroup;
 
+    // 운동 하나 안의 세트별 상세 기록 (세트마다 다른 무게/반복 관리)
+    @OneToMany(mappedBy = "routine", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RoutineSet> routineSets = new ArrayList<>();
+
+    public RoutineSet addSet(Double weight, Integer reps) {
+        RoutineSet set = new RoutineSet();
+        set.setRoutine(this);
+        set.setWeight(weight != null ? weight : 0);
+        set.setReps(reps != null ? reps : 0);
+        set.setSetOrder(routineSets.size() + 1);
+        routineSets.add(set);
+        this.sets = routineSets.size();
+        return set;
+    }
+
+    public List<RoutineSet> getRoutineSets() {
+        return routineSets.stream()
+                .sorted(Comparator.comparingInt(RoutineSet::getSetOrder))
+                .toList();
+    }
+
+    public void setRoutineSets(List<RoutineSet> routineSets) {
+        this.routineSets = routineSets;
+    }
 
     //Getter Setter
     public Member getMember() {
@@ -95,3 +123,4 @@ public class Routine {
     }
 
 }
+

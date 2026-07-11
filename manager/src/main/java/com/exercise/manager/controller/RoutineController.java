@@ -5,6 +5,7 @@
     import com.exercise.manager.domain.RoutineGroup;
     import com.exercise.manager.service.RoutineGroupService;
     import com.exercise.manager.service.RoutineService;
+    import com.exercise.manager.service.RoutineSetService;
     import com.exercise.manager.service.WorksOutService;
     import jakarta.servlet.http.HttpSession;
     import org.springframework.data.repository.query.Param;
@@ -19,13 +20,16 @@
         private final RoutineService routineService;
         private final WorksOutService worksOutService;
         private final RoutineGroupService routineGroupService;
+        private final RoutineSetService routineSetService;
 
         public RoutineController(RoutineService routineService,
                                  WorksOutService worksOutService,
-                                 RoutineGroupService routineGroupService) {
+                                 RoutineGroupService routineGroupService,
+                                 RoutineSetService routineSetService) {
             this.routineService = routineService;
             this.worksOutService = worksOutService;
             this.routineGroupService = routineGroupService;
+            this.routineSetService = routineSetService;
         }
 
 
@@ -34,11 +38,16 @@
         public String list(
                 @RequestParam(defaultValue = "전체") String bodyPart,
                 @RequestParam Long groupId,
-                Model model
+                Model model,
+                HttpSession session
         ) {
+            Member loginMember = (Member) session.getAttribute("loginMember");
+            if (loginMember == null) return "redirect:/login";
+
             model.addAttribute("worksout", worksOutService.findByPart(bodyPart));
             model.addAttribute("selectedPart", bodyPart);
             model.addAttribute("groupId", groupId);
+            model.addAttribute("lastUsed", routineService.findLastUsedByWorksOut(loginMember));
             if (groupId == null) {
                 throw new IllegalArgumentException("groupId가 누락되었습니다.");
             }
@@ -60,6 +69,13 @@
                             routine.setPart(w.getPart());       //운동 부위 복사
                         });
             }
+
+            // 입력한 세트 수만큼 동일한 무게/반복으로 초기 세트를 만들어둠 (이후 상세화면에서 세트별로 다르게 조정 가능)
+            int initialSets = Math.max(routine.getSets(), 1);
+            for (int i = 0; i < initialSets; i++) {
+                routine.addSet(routine.getWeight(), routine.getReps());
+            }
+
             routineService.saveRoutine(loginMember, routine);
             return "redirect:/routine/list?groupId=" + groupId;
         }
@@ -103,6 +119,53 @@
             routineService.updateRoutine(id,sets,reps,weight);
             return "redirect:/calender/detail?date="+ date;
 
+        }
+
+        //운동 하나의 세트별 상세 화면
+        @GetMapping("/{id}/detail")
+        public String routineDetail(@PathVariable Long id, Model model, HttpSession session) {
+            Member loginMember = (Member) session.getAttribute("loginMember");
+            if (loginMember == null) return "redirect:/login";
+
+            Routine routine = routineService.findById(id);
+            model.addAttribute("routine", routine);
+            model.addAttribute("sets", routineSetService.findByRoutine(id));
+            return "routine/routineDetail";
+        }
+
+        //세트 추가
+        @PostMapping("/{id}/set/add")
+        public String addSet(@PathVariable Long id,
+                             @RequestParam(required = false) Double weight,
+                             @RequestParam(required = false) Integer reps) {
+            routineSetService.addSet(id, weight, reps);
+            return "redirect:/routine/" + id + "/detail";
+        }
+
+        //세트 완료 체크 토글
+        @PostMapping("/set/toggle/{setId}")
+        public String toggleSet(@PathVariable Long setId,
+                                @RequestParam Long routineId) {
+            routineSetService.toggleCompleted(setId);
+            return "redirect:/routine/" + routineId + "/detail";
+        }
+
+        //세트 수정
+        @PostMapping("/set/update/{setId}")
+        public String updateSet(@PathVariable Long setId,
+                                @RequestParam Long routineId,
+                                @RequestParam double weight,
+                                @RequestParam int reps) {
+            routineSetService.updateSet(setId, weight, reps);
+            return "redirect:/routine/" + routineId + "/detail";
+        }
+
+        //세트 삭제
+        @PostMapping("/set/delete/{setId}")
+        public String deleteSet(@PathVariable Long setId,
+                                @RequestParam Long routineId) {
+            routineSetService.deleteSet(setId);
+            return "redirect:/routine/" + routineId + "/detail";
         }
 
     }

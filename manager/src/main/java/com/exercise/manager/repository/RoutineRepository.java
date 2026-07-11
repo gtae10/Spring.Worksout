@@ -15,4 +15,5 @@ public interface RoutineRepository extends JpaRepository<Routine,Long> {
     void deleteById(Long id);
     List<Routine> findByMember(Member member);
     List<Routine> findByRoutineGroupId(Long groupId);
+    List<Routine> findByMemberOrderByIdDesc(Member member);
 }

@@ -45,4 +45,16 @@ public class RoutineService {
         r.setReps(reps);
         r.setWeight(weight);
     }
+
+    // 회원이 각 운동 종목(worksOutId)별로 가장 최근에 사용한 무게/반복을 담은 맵 반환
+    // (운동 검색 화면에서 "지난번 무게" 기본값으로 채워주는 용도)
+    public java.util.Map<Long, Routine> findLastUsedByWorksOut(Member member) {
+        java.util.Map<Long, Routine> lastUsed = new java.util.HashMap<>();
+        for (Routine r : routineRepository.findByMemberOrderByIdDesc(member)) {
+            if (r.getWorksOut() == null) continue;
+            Long worksOutId = r.getWorksOut().getId();
+            lastUsed.putIfAbsent(worksOutId, r); // id desc로 정렬돼있어서 처음 등장하는 게 가장 최근 것
+        }
+        return lastUsed;
+    }
 }
