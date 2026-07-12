@@ -33,7 +33,7 @@
                th:onclick="|location.href='@{/routine/list(bodyPart='하체', groupId=${groupId})}'|">하체</label>
     </div>
 
-    <div id="exerciseTable" class="card" style="padding: 4px 12px;">
+    <div id="exerciseTable" class="card exercise-list-scroll" style="padding: 4px 12px;">
         <div class="exercise-row" th:each="w : ${worksout}">
             <span class="exercise-avatar">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 7v10M18 7v10M2 12h4M18 12h4M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -72,17 +72,19 @@
                 <label class="form-label">운동명</label>
                 <input class="form-input" type="text" id="modalExerciseName" readonly>
             </div>
-            <div class="form-group">
-                <label class="form-label">세트</label>
-                <input class="form-input" type="number" id="modalSets" name="sets" min="1" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label">반복</label>
-                <input class="form-input" type="number" id="modalReps" name="reps" min="1" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label">무게(kg)</label>
-                <input class="form-input" type="number" id="modalWeight" name="weight" step="0.5" min="0">
+            <div class="form-group" style="display:flex; gap:8px;">
+                <div style="flex:1;">
+                    <label class="form-label">세트</label>
+                    <input class="form-input" type="number" id="modalSets" name="sets" min="1" required>
+                </div>
+                <div style="flex:1;">
+                    <label class="form-label">반복</label>
+                    <input class="form-input" type="number" id="modalReps" name="reps" min="1" required>
+                </div>
+                <div style="flex:1;">
+                    <label class="form-label">무게(kg)</label>
+                    <input class="form-input" type="number" id="modalWeight" name="weight" step="0.5" min="0">
+                </div>
             </div>
 
             <button type="submit" class="btn btn-primary btn-block">등록</button>

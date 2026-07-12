@@ -74,4 +74,32 @@ public class RoutineGroup {
                 .collect(Collectors.toList());
     }
 
+    // 화면 표시용: 이 그룹에 속한 모든 운동의 총 볼륨(무게 x 반복 합계)
+    public double getTotalVolume() {
+        return routines.stream()
+                .mapToDouble(Routine::getVolume)
+                .sum();
+    }
+
+    // 화면 표시용: 이 그룹에 속한 모든 운동의 총 세트 수 합
+    public int getTotalSets() {
+        return routines.stream()
+                .mapToInt(Routine::getTotalSetsCount)
+                .sum();
+    }
+
+    // 화면 표시용: 이 그룹에 속한 모든 운동의 총 반복 횟수 합
+    public int getTotalReps() {
+        return routines.stream()
+                .mapToInt(Routine::getTotalRepsCount)
+                .sum();
+    }
+
+    // 화면 표시용: 이 그룹에 속한 모든 운동의 예상 소모 칼로리 합
+    public double getEstimatedCalories(double bodyWeightKg) {
+        return routines.stream()
+                .mapToDouble(r -> r.getEstimatedCalories(bodyWeightKg))
+                .sum();
+    }
+
 }

@@ -16,12 +16,23 @@
 <div th:replace="~{fragments/layout :: navbar(active='record')}"></div>
 
 <div class="page">
-    <p class="section-sub" style="margin-top: 14px;">날짜를 눌러서 그날의 루틴을 배정하거나 기록을 확인해보세요.</p>
+    <p class="section-sub" style="margin-top: 14px;">날짜를 눌러서 그날의 루틴을 배정하거나 기록을 확인해보세요. 이미 배정된 날짜는 <b>우클릭</b>하면 삭제할 수 있어요.</p>
     <div id="calendar"></div>
 </div>
 
+<!-- 우클릭 컨텍스트 메뉴 -->
+<div id="ctxMenu" class="ctx-menu">
+    <button type="button" onclick="confirmDeleteCalender()">🗑 이 날짜 루틴 삭제</button>
+</div>
+
+<!-- 삭제 전송용 히든 폼 -->
+<form id="deleteCalenderForm" th:action="@{/calender/delete}" method="post" style="display:none;">
+    <input type="hidden" name="date" id="deleteCalenderDate">
+</form>
+
 <script th:inline="javascript">
     const assignedDates = /*[[${assignedDates}]]*/ [];
+    let ctxTargetDate = null;
 
     document.addEventListener("DOMContentLoaded", function () {
         const calendarEl = document.getElementById("calendar");
@@ -42,11 +53,45 @@
 
             dateClick: function(info) {
                 window.location.href = "/calender/select?date=" + info.dateStr;
+            },
+
+            eventClick: function(info) {
+                window.location.href = "/calender/select?date=" + info.event.startStr;
+            },
+
+            eventDidMount: function(info) {
+                info.el.addEventListener("contextmenu", function (e) {
+                    e.preventDefault();
+                    showCtxMenu(e.pageX, e.pageY, info.event.startStr);
+                });
             }
         });
 
         calendar.render();
     });
+
+    function showCtxMenu(x, y, date) {
+        ctxTargetDate = date;
+        const menu = document.getElementById("ctxMenu");
+        menu.style.left = x + "px";
+        menu.style.top = y + "px";
+        menu.style.display = "block";
+    }
+
+    function hideCtxMenu() {
+        document.getElementById("ctxMenu").style.display = "none";
+    }
+
+    function confirmDeleteCalender() {
+        hideCtxMenu();
+        if (!ctxTargetDate) return;
+        if (!confirm(ctxTargetDate + " 날짜의 루틴 배정을 삭제할까요?\n그날 기록해둔 세트도 함께 삭제돼요.")) return;
+        document.getElementById("deleteCalenderDate").value = ctxTargetDate;
+        document.getElementById("deleteCalenderForm").submit();
+    }
+
+    window.addEventListener("click", hideCtxMenu);
+    window.addEventListener("scroll", hideCtxMenu);
 </script>
 </body>
 </html>

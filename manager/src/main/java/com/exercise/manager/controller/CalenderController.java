@@ -87,6 +87,14 @@ public class CalenderController {
         calendarService.save(calender);
         return  "redirect:/calender/detail?date=" +date;
     }
+    //날짜에 배정된 루틴 삭제 (달력에서 우클릭 메뉴로 사용)
+    @PostMapping("/delete")
+    public String deleteAssign(@RequestParam String date, HttpSession session){
+        Member member = (Member) session.getAttribute("loginMember");
+        calendarService.deleteByMemberAndDate(member, LocalDate.parse(date));
+        return "redirect:/calender/calender";
+    }
+
     // 날짜 상세기록
     @GetMapping("/detail")
     public String detail(@RequestParam String date, HttpSession session, Model model){

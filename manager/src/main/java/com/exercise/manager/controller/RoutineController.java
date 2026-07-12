@@ -99,6 +99,12 @@
             model.addAttribute("groupId", groupId);
             model.addAttribute("groupTitle", routineGroup.getTitle());
             model.addAttribute("bodyParts", routineGroup.getDistinctParts());
+            model.addAttribute("totalVolume", routineGroup.getTotalVolume());
+            model.addAttribute("totalSets", routineGroup.getTotalSets());
+            model.addAttribute("totalReps", routineGroup.getTotalReps());
+            model.addAttribute("bodyWeight", loginMember.getWeight());
+            model.addAttribute("estimatedCalories", routineGroup.getEstimatedCalories(
+                    loginMember.getWeight() != null ? loginMember.getWeight() : 0));
             return "routine/worksoutList";
         }
 
@@ -130,6 +136,9 @@
             Routine routine = routineService.findById(id);
             model.addAttribute("routine", routine);
             model.addAttribute("sets", routineSetService.findByRoutine(id));
+            model.addAttribute("bodyWeight", loginMember.getWeight());
+            model.addAttribute("estimatedCalories", routine.getEstimatedCalories(
+                    loginMember.getWeight() != null ? loginMember.getWeight() : 0));
             return "routine/routineDetail";
         }
 

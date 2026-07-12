@@ -24,11 +24,21 @@
         <svg viewBox="0 0 24 24" fill="none"><path d="M5 19V10M12 19V5M19 19v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <span>통계</span>
     </a>
-    <a th:href="@{/routinegroup/list}" class="nav-item" th:classappend="${active == 'menu'} ? 'active' : ''">
+    <a th:href="@{/menu}" class="nav-item" th:classappend="${active == 'menu'} ? 'active' : ''">
         <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <span>메뉴</span>
     </a>
 </nav>
+
+<!-- 체중 미입력 시 칼로리 계산용 체중 입력 유도 카드 -->
+<div th:fragment="weightPrompt(returnTo)" class="card" style="padding:14px 16px;">
+    <div style="font-size:13px; color:var(--text-dim); margin-bottom:8px;">체중을 입력하면 예상 칼로리도 같이 보여드려요</div>
+    <form th:action="@{/member/weight}" method="post" style="display:flex; gap:8px;">
+        <input type="hidden" name="returnTo" th:value="${returnTo}">
+        <input class="form-input" type="number" name="weight" step="0.1" min="1" placeholder="체중(kg)" required style="flex:1;">
+        <button type="submit" class="btn btn-secondary" style="padding:10px 16px; font-size:13px; flex-shrink:0;">저장</button>
+    </form>
+</div>
 
 </body>
 </html>

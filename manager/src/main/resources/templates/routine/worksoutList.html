@@ -15,10 +15,22 @@
 <div class="page">
 
     <!-- 이 루틴에 포함된 운동 부위 태그 -->
-    <div class="part-hero">
-        <span class="part-pill" th:each="part : ${bodyParts}" th:text="${part}">부위</span>
-        <span th:if="${#lists.isEmpty(bodyParts)}" style="color: var(--text-faint); font-size: 14px;">아직 등록된 운동이 없어요</span>
+    <div class="part-hero" style="flex-direction: column; align-items: flex-start; gap: 12px;">
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <span class="part-pill" th:each="part : ${bodyParts}" th:text="${part}">부위</span>
+            <span th:if="${#lists.isEmpty(bodyParts)}" style="color: var(--text-faint); font-size: 14px;">아직 등록된 운동이 없어요</span>
+        </div>
+        <div th:if="${totalVolume != null and totalVolume > 0}" style="display:flex; flex-wrap:wrap; gap:16px; color: var(--text-dim); font-size: 13px;">
+            <span>총 볼륨 <strong style="color: var(--text); font-size: 15px;" th:text="${#numbers.formatDecimal(totalVolume, 0, 'COMMA', 0, 'POINT')}">0</strong> kg</span>
+            <span>세트 <strong style="color: var(--text);" th:text="${totalSets}">0</strong></span>
+            <span>반복 <strong style="color: var(--text);" th:text="${totalReps}">0</strong>회</span>
+            <span>운동 <strong style="color: var(--text);" th:text="${routines.size()}">0</strong>개</span>
+            <span th:if="${bodyWeight != null}">예상 칼로리 <strong style="color: var(--accent);" th:text="${#numbers.formatDecimal(estimatedCalories, 0, 'COMMA', 0, 'POINT')}">0</strong> kcal</span>
+        </div>
     </div>
+
+    <div th:if="${bodyWeight == null and totalVolume != null and totalVolume > 0}" style="margin-bottom: 14px;"
+         th:replace="~{fragments/layout :: weightPrompt(returnTo=@{/routine/group/{groupId}(groupId=${groupId})})}"></div>
 
     <div th:if="${#lists.isEmpty(routines)}" class="empty-state">
         + 운동 추가 버튼을 눌러 첫 운동을 등록해보세요.
@@ -31,7 +43,7 @@
                 <div class="exercise-info">
                     <div class="exercise-name" th:text="${r.workout}">운동명</div>
                     <div class="exercise-part"
-                         th:text="${r.sets} + '세트 · ' + ${r.reps} + '회' + (${r.weight} > 0 ? ' · ' + ${r.weight} + 'kg' : '')">
+                         th:text="${r.sets} + '세트 · ' + ${r.reps} + '회' + (${r.weight} > 0 ? ' · ' + ${r.weight} + 'kg' : '') + (${r.volume} > 0 ? ' · 볼륨 ' + ${#numbers.formatDecimal(r.volume, 0, 'COMMA', 0, 'POINT')} + 'kg' : '')">
                         3세트 · 15회
                     </div>
                 </div>
@@ -47,6 +59,14 @@
 
     <a class="btn btn-primary btn-block" style="margin-top: 18px;"
        th:href="@{/routine/list(groupId=${groupId})}">+ 운동 추가</a>
+
+    <form th:action="@{/calender/assign}" method="post" style="margin-top: 10px;">
+        <input type="hidden" name="date" th:value="${T(java.time.LocalDate).now()}">
+        <input type="hidden" name="groupId" th:value="${groupId}">
+        <button type="submit" class="btn btn-secondary btn-block">
+            ✓ 오늘 운동 완료로 기록하기
+        </button>
+    </form>
 
 </div>
 

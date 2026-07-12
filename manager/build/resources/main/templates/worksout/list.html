@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>운동 목록</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/layout :: topbar(title='운동 목록', backUrl=@{/menu})}"></div>
+<div th:replace="~{fragments/layout :: navbar(active='menu')}"></div>
+
+<div class="page">
+
+    <div class="search-box">
+        <input type="text" id="searchInput" class="search-input" placeholder="운동명을 입력하세요" onkeyup="searchExercise()">
+    </div>
+
+    <div class="chip-row">
+        <label class="chip" th:classappend="${selectedPart == '전체'} ? 'active' : ''"
+               th:onclick="|location.href='@{/worksout/list(bodyPart='전체')}'|">전체</label>
+        <label class="chip" th:classappend="${selectedPart == '가슴'} ? 'active' : ''"
+               th:onclick="|location.href='@{/worksout/list(bodyPart='가슴')}'|">가슴</label>
+        <label class="chip" th:classappend="${selectedPart == '등'} ? 'active' : ''"
+               th:onclick="|location.href='@{/worksout/list(bodyPart='등')}'|">등</label>
+        <label class="chip" th:classappend="${selectedPart == '어깨'} ? 'active' : ''"
+               th:onclick="|location.href='@{/worksout/list(bodyPart='어깨')}'|">어깨</label>
+        <label class="chip" th:classappend="${selectedPart == '팔'} ? 'active' : ''"
+               th:onclick="|location.href='@{/worksout/list(bodyPart='팔')}'|">팔</label>
+        <label class="chip" th:classappend="${selectedPart == '하체'} ? 'active' : ''"
+               th:onclick="|location.href='@{/worksout/list(bodyPart='하체')}'|">하체</label>
+    </div>
+
+    <div class="card exercise-list-scroll" style="padding: 4px 12px;">
+        <div class="exercise-row" th:each="w : ${worksout}">
+            <span class="exercise-avatar">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 7v10M18 7v10M2 12h4M18 12h4M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+            <div class="exercise-info">
+                <div class="exercise-name" th:text="${w.workout}">운동명</div>
+                <div class="exercise-part" th:text="${w.part}">부위</div>
+            </div>
+        </div>
+        <div th:if="${#lists.isEmpty(worksout)}" class="empty-state">해당하는 운동이 없어요.</div>
+    </div>
+
+</div>
+
+<script>
+    function searchExercise() {
+        const input = document.getElementById("searchInput").value.toLowerCase();
+        const rows = document.querySelectorAll(".exercise-row");
+        rows.forEach(row => {
+            const name = row.querySelector(".exercise-name").innerText.toLowerCase();
+            row.style.display = name.includes(input) ? "" : "none";
+        });
+    }
+</script>
+
+</body>
+</html>

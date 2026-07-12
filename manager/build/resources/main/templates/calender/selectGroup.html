@@ -15,18 +15,29 @@
 
     <p class="section-sub" th:text="'선택한 날짜: ' + ${date}" style="margin-top: 8px;">선택한 날짜</p>
 
-    <form th:action="@{/calender/assign}" method="post">
-        <input type="hidden" name="date" th:value="${date}">
-        <div class="form-group">
-            <label class="form-label">루틴 그룹</label>
-            <select name="groupId" class="form-select" required>
-                <option th:each="g : ${groups}" th:value="${g.id}" th:text="${g.title}"></option>
-            </select>
-        </div>
-        <button type="submit" class="btn btn-primary btn-block">이 루틴으로 배정</button>
-    </form>
+    <div th:if="${#lists.isEmpty(groups)}" class="empty-state">
+        아직 만든 루틴 그룹이 없어요.<br>새 그룹을 먼저 만들어주세요.
+    </div>
 
-    <a th:href="@{/routinegroup/new}" class="btn btn-secondary btn-block" style="margin-top: 10px;">+ 새 루틴 생성</a>
+    <div class="routine-grid">
+        <form th:each="g : ${groups}" th:action="@{/calender/assign}" method="post">
+            <input type="hidden" name="date" th:value="${date}">
+            <input type="hidden" name="groupId" th:value="${g.id}">
+            <button type="submit" class="card routine-card" style="width:100%; text-align:left; border:none; cursor:pointer; font: inherit;">
+                <span class="routine-card-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" fill="currentColor"/></svg>
+                </span>
+                <div class="routine-card-body">
+                    <div class="routine-card-title" th:text="${g.title}">루틴 그룹</div>
+                    <span class="tag" th:if="${!g.bodyParts.isEmpty()}" th:text="${g.bodyParts}">부위</span>
+                    <span class="routine-card-meta" th:if="${g.bodyParts.isEmpty()}"
+                          th:text="${g.routines.size()} + '개 운동'">0개 운동</span>
+                </div>
+            </button>
+        </form>
+    </div>
+
+    <a th:href="@{/routinegroup/new}" class="btn btn-secondary btn-block" style="margin-top: 14px;">+ 새 루틴 생성</a>
 
 </div>
 

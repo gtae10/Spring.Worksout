@@ -233,12 +233,21 @@ h1, h2, h3, p { margin: 0; }
   gap: 8px;
 }
 .quick-action-icon {
+  position: relative;
   width: 52px; height: 52px;
   border-radius: 16px;
   background: var(--surface);
   border: 1px solid var(--border);
   display: flex; align-items: center; justify-content: center;
   color: var(--accent);
+}
+.quick-action-badge {
+  position: absolute;
+  top: -3px; right: -3px;
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
 }
 .quick-action span { font-size: 12px; color: var(--text-dim); }
 
@@ -296,6 +305,12 @@ h1, h2, h3, p { margin: 0; }
   border-bottom: 1px solid var(--border);
 }
 .exercise-row:last-child { border-bottom: none; }
+
+.exercise-list-scroll {
+  max-height: calc(100vh - 260px);
+  min-height: 260px;
+  overflow-y: auto;
+}
 .exercise-avatar {
   width: 46px; height: 46px;
   border-radius: 12px;
@@ -425,6 +440,15 @@ h1, h2, h3, p { margin: 0; }
   text-align: center;
   margin-top: 12px;
 }
+.auth-success {
+  color: var(--green);
+  font-size: 13px;
+  text-align: center;
+  margin-top: 12px;
+  background: var(--green-soft);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+}
 .auth-links { text-align: center; margin-top: 16px; font-size: 13px; color: var(--text-faint); }
 
 /* ---------- FullCalendar dark override ---------- */
@@ -447,6 +471,35 @@ h1, h2, h3, p { margin: 0; }
 #calendar .fc-day-today .fc-daygrid-day-number { color: var(--accent); font-weight: 700; }
 #calendar .fc-event { border: none; border-radius: 6px; padding: 1px 4px; font-size: 11px; cursor: pointer; }
 #calendar a { color: inherit; }
+
+/* ---------- 우클릭 컨텍스트 메뉴 ---------- */
+.ctx-menu {
+  display: none;
+  position: fixed;
+  z-index: 200;
+  min-width: 180px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+.ctx-menu button {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+.ctx-menu button:hover,
+.ctx-menu button:active {
+  background: var(--surface-2);
+  color: var(--accent);
+}
 
 /* ---------- Record detail (calender/detail) ---------- */
 .record-row {
@@ -520,4 +573,36 @@ h1, h2, h3, p { margin: 0; }
   display: flex;
   justify-content: flex-end;
   padding: 10px 4px 4px;
+}
+
+/* ---------- 휴식 타이머 ---------- */
+.rest-timer {
+  position: fixed;
+  left: 50%;
+  bottom: -80px;
+  transform: translateX(-50%);
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  transition: bottom 0.25s ease;
+  white-space: nowrap;
+}
+.rest-timer.show { bottom: 24px; }
+.rest-timer button {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
 }

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>개인 기록</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/layout :: topbar(title='개인 기록(PR)', backUrl=@{/menu})}"></div>
+<div th:replace="~{fragments/layout :: navbar(active='menu')}"></div>
+
+<div class="page">
+
+    <p class="section-sub" style="margin-top: 14px;">
+        지금까지 등록한 세트 중 운동별로 가장 무거웠던 기록이에요. (에플리 공식 기준 추정 1RM 순)
+    </p>
+
+    <div th:if="${#lists.isEmpty(prList)}" class="empty-state">
+        아직 기록이 없어요. 루틴에 운동을 추가하고 세트를 기록해보세요.
+    </div>
+
+    <div class="card" style="padding: 4px 12px;" th:unless="${#lists.isEmpty(prList)}">
+        <div class="exercise-row" th:each="pr : ${prList}">
+            <span class="exercise-avatar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" fill="currentColor"/></svg>
+            </span>
+            <div class="exercise-info">
+                <div class="exercise-name" th:text="${pr.workout}">운동명</div>
+                <div class="exercise-part"
+                     th:text="${pr.part} + ' · ' + ${pr.weight} + 'kg × ' + ${pr.reps} + '회'">부위 · 기록</div>
+            </div>
+            <div style="text-align:right;">
+                <div style="font-size:11px; color:var(--text-faint);">추정 1RM</div>
+                <div style="font-weight:800; color:var(--accent);"
+                     th:text="${#numbers.formatDecimal(pr.estimatedOneRm, 0, 'COMMA', 0, 'POINT')} + 'kg'">0kg</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

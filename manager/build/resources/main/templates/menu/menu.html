@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>메뉴</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/layout :: topbar(title='메뉴', backUrl=@{/member/main})}"></div>
+<div th:replace="~{fragments/layout :: navbar(active='menu')}"></div>
+
+<div class="page">
+
+    <div class="routine-grid" style="margin-top: 14px;">
+        <a class="card routine-card" th:href="@{/member/profile}">
+            <span class="routine-card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-4 3.5-6.5 8-6.5s8 2.5 8 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+            <div class="routine-card-body">
+                <div class="routine-card-title">회원 프로필</div>
+                <span class="routine-card-meta">신체 정보 및 이름 수정</span>
+            </div>
+        </a>
+
+        <a class="card routine-card" th:href="@{/worksout/list}">
+            <span class="routine-card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 7v10M18 7v10M2 12h4M18 12h4M8 12h8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            </span>
+            <div class="routine-card-body">
+                <div class="routine-card-title">운동 목록</div>
+                <span class="routine-card-meta">부위별 전체 운동 종목 보기</span>
+            </div>
+        </a>
+
+        <a class="card routine-card" th:href="@{/menu/1rm}">
+            <span class="routine-card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 8h8M8 12h2M12 12h2M16 12h2M8 16h2M12 16h2M16 16h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+            <div class="routine-card-body">
+                <div class="routine-card-title">1RM 계산기</div>
+                <span class="routine-card-meta">무게·반복으로 최대 중량 추정</span>
+            </div>
+        </a>
+
+        <a class="card routine-card" th:href="@{/menu/pr}">
+            <span class="routine-card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.5 6.5H21l-5.3 4.1 2 6.6L12 15.8 6.3 19.2l2-6.6L3 8.5h6.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            </span>
+            <div class="routine-card-body">
+                <div class="routine-card-title">개인 기록(PR)</div>
+                <span class="routine-card-meta">운동별 최고 기록 모아보기</span>
+            </div>
+        </a>
+
+        <a class="card routine-card" th:href="@{/menu/calorie}">
+            <span class="routine-card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 21c4-2.5 6-5.2 6-8.5C18 8 14.5 5 12 2c0 3-1.5 4.5-3 6-1 1.2-2 2.7-2 4.5 0 3.3 2 6 5 8.5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            </span>
+            <div class="routine-card-body">
+                <div class="routine-card-title">칼로리 계산기</div>
+                <span class="routine-card-meta">하루 권장 칼로리·영양소 비율</span>
+            </div>
+        </a>
+    </div>
+
+</div>
+
+</body>
+</html>

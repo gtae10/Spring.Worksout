@@ -23,4 +23,8 @@ public class WorkOutRecordService {
     public List<WorkOutRecord> findByCalender(Calender calender) {
         return workOutRecordRepository.findByCalender(calender);
     }
+
+    public void deleteByCalender(Calender calender) {
+        workOutRecordRepository.deleteAll(workOutRecordRepository.findByCalender(calender));
+    }
 }

@@ -21,7 +21,7 @@
         <form action="/member/new" method="post">
             <div class="form-group">
                 <label class="form-label">아이디</label>
-                <input class="form-input" type="text" name="id" placeholder="ID를 입력하세요" required>
+                <input class="form-input" type="text" name="id" placeholder="ID를 입력하세요" th:value="${prevId}" required>
             </div>
             <div class="form-group">
                 <label class="form-label">비밀번호</label>
@@ -29,10 +29,18 @@
             </div>
             <div class="form-group">
                 <label class="form-label">이름</label>
-                <input class="form-input" type="text" name="name" placeholder="이름을 입력하세요" required>
+                <input class="form-input" type="text" name="name" placeholder="이름을 입력하세요" th:value="${prevName}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">체중(kg) <span style="color: var(--text-faint); font-weight: 400;">· 선택, 칼로리 계산용</span></label>
+                <input class="form-input" type="number" name="weight" step="0.1" min="1" placeholder="예: 70">
             </div>
             <button type="submit" class="btn btn-primary btn-block">가입하기</button>
         </form>
+
+        <div th:if="${error == 'duplicate'}" class="auth-error">
+            이미 존재하는 아이디예요. 다른 아이디를 입력해주세요.
+        </div>
 
         <div class="auth-links">
             이미 계정이 있으신가요?

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${routine.workout}">운동 상세</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/layout :: topbar(title=${routine.workout}, backUrl=@{/routine/group/{groupId}(groupId=${routine.routineGroup.id})})}"></div>
+<div th:replace="~{fragments/layout :: navbar(active='home')}"></div>
+
+<div class="page">
+
+    <p class="section-sub" style="margin-top: 14px;" th:text="${routine.part} + ' · 세트마다 무게/반복을 따로 조절할 수 있어요'">부위</p>
+
+    <div th:if="${routine.volume > 0}" style="display:flex; flex-wrap:wrap; gap:16px; color: var(--text-dim); font-size: 13px; margin-bottom: 14px;">
+        <span>총 볼륨 <strong style="color: var(--text); font-size: 15px;" th:text="${#numbers.formatDecimal(routine.volume, 0, 'COMMA', 0, 'POINT')}">0</strong> kg</span>
+        <span>세트 <strong style="color: var(--text);" th:text="${routine.totalSetsCount}">0</strong></span>
+        <span>반복 <strong style="color: var(--text);" th:text="${routine.totalRepsCount}">0</strong>회</span>
+        <span th:if="${bodyWeight != null}">예상 칼로리 <strong style="color: var(--accent);" th:text="${#numbers.formatDecimal(estimatedCalories, 0, 'COMMA', 0, 'POINT')}">0</strong> kcal</span>
+    </div>
+
+    <div th:if="${bodyWeight == null and routine.volume > 0}" style="margin-bottom: 14px;"
+         th:replace="~{fragments/layout :: weightPrompt(returnTo=@{/routine/{id}/detail(id=${routine.id})})}"></div>
+
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom: 10px; font-size:13px; color:var(--text-dim);">
+        <span>세트 완료 시 휴식</span>
+        <button type="button" class="chip" id="restOpt60" onclick="setRestDuration(60)">60초</button>
+        <button type="button" class="chip" id="restOpt90" onclick="setRestDuration(90)">90초</button>
+    </div>
+
+    <div class="card" style="padding: 10px 12px;">
+        <div class="set-head">
+            <span>세트</span><span>무게(kg)</span><span>반복</span><span></span><span></span><span></span>
+        </div>
+
+        <div class="set-row" th:each="s, iter : ${sets}" th:classappend="${s.completed} ? 'completed' : ''" th:id="'row-' + ${s.id}">
+            <form th:action="@{/routine/set/update/{setId}(setId=${s.id})}" method="post" style="display:contents;">
+                <input type="hidden" name="routineId" th:value="${routine.id}">
+                <span class="set-badge" th:text="${s.setOrder}">1</span>
+                <input class="form-input" type="number" name="weight" step="0.5" min="0" th:value="${s.weight}" onchange="this.form.submit()">
+                <input class="form-input" type="number" name="reps" min="0" th:value="${s.reps}" onchange="this.form.submit()">
+            </form>
+
+            <form th:action="@{/routine/set/toggle/{setId}(setId=${s.id})}" method="post" onsubmit="return toggleDone(event, this)">
+                <input type="hidden" name="routineId" th:value="${routine.id}">
+                <button type="submit" class="btn-icon toggle-done" th:classappend="${s.completed} ? 'active' : ''" title="완료 체크">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+            </form>
+
+            <form th:action="@{/routine/set/delete/{setId}(setId=${s.id})}" method="post">
+                <input type="hidden" name="routineId" th:value="${routine.id}">
+                <button type="submit" class="btn-icon" title="삭제">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+            </form>
+
+            <!-- 마지막 세트 줄에만 삭제 아이콘 바로 옆에 + 버튼 -->
+            <form th:if="${iter.last}" th:action="@{/routine/{id}/set/add(id=${routine.id})}" method="post">
+                <button type="submit" class="btn-icon" title="세트 추가">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+                </button>
+            </form>
+        </div>
+
+        <div th:if="${#lists.isEmpty(sets)}" class="empty-state">아직 세트가 없어요. 아래 + 버튼으로 추가해보세요.</div>
+
+        <!-- 세트가 하나도 없을 때만 보이는 대체 + 버튼 -->
+        <div th:if="${#lists.isEmpty(sets)}" class="add-set-row">
+            <form th:action="@{/routine/{id}/set/add(id=${routine.id})}" method="post">
+                <button type="submit" class="btn-icon" title="세트 추가">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+                </button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<!-- 휴식 타이머 -->
+<div id="restTimer" class="rest-timer">
+    <span>휴식 중 · <strong id="restTimerText">60</strong>초</span>
+    <button type="button" onclick="adjustRest(15)">+15초</button>
+    <button type="button" onclick="dismissRest()">건너뛰기</button>
+</div>
+
+<script>
+    let restDuration = 60;
+    let restInterval = null;
+    let restRemaining = 0;
+
+    function setRestDuration(sec) {
+        restDuration = sec;
+        document.getElementById("restOpt60").classList.toggle("active", sec === 60);
+        document.getElementById("restOpt90").classList.toggle("active", sec === 90);
+    }
+    setRestDuration(60);
+
+    function toggleDone(evt, form) {
+        evt.preventDefault();
+        const btn = form.querySelector(".toggle-done");
+
+        fetch(form.action, {
+            method: "POST",
+            headers: { "X-Requested-With": "XMLHttpRequest", "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams(new FormData(form))
+        }).then(() => {
+            const nowActive = !btn.classList.contains("active");
+            btn.classList.toggle("active", nowActive);
+            btn.closest(".set-row").classList.toggle("completed", nowActive);
+            if (nowActive) startRest();
+        });
+
+        return false;
+    }
+
+    function startRest() {
+        clearInterval(restInterval);
+        restRemaining = restDuration;
+        const timer = document.getElementById("restTimer");
+        const text = document.getElementById("restTimerText");
+        timer.classList.add("show");
+        text.textContent = restRemaining;
+
+        restInterval = setInterval(() => {
+            restRemaining--;
+            text.textContent = restRemaining;
+            if (restRemaining <= 0) {
+                clearInterval(restInterval);
+                timer.classList.remove("show");
+            }
+        }, 1000);
+    }
+
+    function adjustRest(sec) {
+        restRemaining += sec;
+        document.getElementById("restTimerText").textContent = restRemaining;
+    }
+
+    function dismissRest() {
+        clearInterval(restInterval);
+        document.getElementById("restTimer").classList.remove("show");
+    }
+</script>
+
+</body>
+</html>

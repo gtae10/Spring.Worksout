@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원 프로필</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="no-nav">
+
+<div th:replace="~{fragments/layout :: topbar(title='회원 프로필', backUrl=@{/menu})}"></div>
+
+<div class="page" style="padding-top: 8px;">
+
+    <div th:if="${saved}" class="auth-success" style="margin-bottom: 14px;">
+        저장됐어요.
+    </div>
+
+    <div class="card" style="display:flex; align-items:center; gap:14px; margin-bottom: 18px;">
+        <span class="routine-card-icon" style="width:52px; height:52px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-4 3.5-6.5 8-6.5s8 2.5 8 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </span>
+        <div>
+            <div style="font-weight:800; font-size:16px;" th:text="${member.name}">이름</div>
+            <div style="color:var(--text-faint); font-size:13px;" th:text="'ID: ' + ${member.id}">ID</div>
+        </div>
+    </div>
+
+    <form th:action="@{/member/profile}" method="post">
+        <div class="form-group">
+            <label class="form-label">이름</label>
+            <input class="form-input" type="text" name="name" th:value="${member.name}" required>
+        </div>
+        <div class="form-group" style="display:flex; gap:8px;">
+            <div style="flex:1;">
+                <label class="form-label">체중(kg)</label>
+                <input class="form-input" type="number" name="weight" step="0.1" min="1" th:value="${member.weight}" placeholder="예: 70">
+            </div>
+            <div style="flex:1;">
+                <label class="form-label">키(cm)</label>
+                <input class="form-input" type="number" name="height" step="0.1" min="1" th:value="${member.height}" placeholder="예: 175">
+            </div>
+        </div>
+
+        <div th:if="${member.bmi != null}" class="section-sub" style="margin-top: -4px;">
+            BMI <strong style="color: var(--text);" th:text="${#numbers.formatDecimal(member.bmi, 1, 2)}">0</strong>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 8px;">저장</button>
+    </form>
+
+    <a th:href="@{/member/export}" class="btn btn-secondary btn-block" style="margin-top: 24px;">
+        ⬇ 내 루틴 데이터 CSV로 내보내기
+    </a>
+
+    <form th:action="@{/member/delete}" method="post" style="margin-top: 10px;"
+          onsubmit="return confirm('정말 탈퇴할까요?\n루틴, 기록 등 모든 데이터가 영구적으로 삭제되고 되돌릴 수 없어요.');">
+        <button type="submit" class="btn btn-block" style="background: none; border: 1px solid var(--border); color: var(--text-faint);">
+            회원 탈퇴
+        </button>
+    </form>
+
+</div>
+
+</body>
+</html>

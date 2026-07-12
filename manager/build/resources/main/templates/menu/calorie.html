@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>칼로리 계산기</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="no-nav">
+
+<div th:replace="~{fragments/layout :: topbar(title='칼로리 계산기', backUrl=@{/menu})}"></div>
+
+<div class="page" style="padding-top: 8px;">
+
+    <p class="section-sub" style="margin-top: 8px;">
+        미프린-세인트 지어(Mifflin-St Jeor) 공식으로 기초대사량과 하루 권장 칼로리·영양소 비율을 추정해요.
+    </p>
+
+    <div class="form-group" style="display:flex; gap:8px;">
+        <div style="flex:1;">
+            <label class="form-label">성별</label>
+            <select class="form-select" id="gender" onchange="calc()">
+                <option value="male">남성</option>
+                <option value="female">여성</option>
+            </select>
+        </div>
+        <div style="flex:1;">
+            <label class="form-label">나이</label>
+            <input class="form-input" type="number" id="age" min="10" max="100" value="25" oninput="calc()">
+        </div>
+    </div>
+
+    <div class="form-group" style="display:flex; gap:8px;">
+        <div style="flex:1;">
+            <label class="form-label">키(cm)</label>
+            <input class="form-input" type="number" id="height" step="0.1" min="100" th:value="${member.height}" placeholder="예: 175" oninput="calc()">
+        </div>
+        <div style="flex:1;">
+            <label class="form-label">체중(kg)</label>
+            <input class="form-input" type="number" id="weight" step="0.1" min="30" th:value="${member.weight}" placeholder="예: 70" oninput="calc()">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">활동량</label>
+        <select class="form-select" id="activity" onchange="calc()">
+            <option value="1.2">거의 안 움직임 (좌식 생활)</option>
+            <option value="1.375">가벼운 활동 (주 1~3회 운동)</option>
+            <option value="1.55" selected>보통 활동 (주 3~5회 운동)</option>
+            <option value="1.725">활발한 활동 (주 6~7회 운동)</option>
+            <option value="1.9">매우 활발함 (매일 강도 높은 운동/육체노동)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">목표</label>
+        <select class="form-select" id="goal" onchange="calc()">
+            <option value="-500">체중 감량 (하루 -500kcal)</option>
+            <option value="0" selected>체중 유지</option>
+            <option value="400">체중 증량 (하루 +400kcal)</option>
+        </select>
+    </div>
+
+    <div class="card" style="text-align:center; padding: 22px 16px;">
+        <div style="font-size:13px; color:var(--text-faint); margin-bottom:6px;">하루 권장 칼로리</div>
+        <div id="tdee" style="font-size:32px; font-weight:800; color:var(--accent);">0</div>
+        <div style="font-size:13px; color:var(--text-faint); margin-top:4px;">kcal</div>
+        <div style="font-size:12px; color:var(--text-faint); margin-top:10px;" id="bmrLine">기초대사량(BMR) 0kcal</div>
+    </div>
+
+    <h2 class="section-title">권장 영양소</h2>
+    <div class="card" style="padding: 4px 12px;">
+        <div class="exercise-row">
+            <div class="exercise-info"><div class="exercise-name">단백질</div><div class="exercise-part">체중 1kg당 약 1.8g</div></div>
+            <div class="exercise-name" id="protein">0g</div>
+        </div>
+        <div class="exercise-row">
+            <div class="exercise-info"><div class="exercise-name">지방</div><div class="exercise-part">전체 칼로리의 약 25%</div></div>
+            <div class="exercise-name" id="fat">0g</div>
+        </div>
+        <div class="exercise-row">
+            <div class="exercise-info"><div class="exercise-name">탄수화물</div><div class="exercise-part">나머지 칼로리</div></div>
+            <div class="exercise-name" id="carb">0g</div>
+        </div>
+    </div>
+
+    <p class="section-sub">
+        추정치예요. 실제 대사량은 근육량·유전·컨디션에 따라 사람마다 차이가 커요. 2~3주 적용해보고 체중 변화를 보면서 칼로리를 조정하는 걸 추천해요.
+    </p>
+
+</div>
+
+<script>
+    function calc() {
+        const gender = document.getElementById("gender").value;
+        const age = parseFloat(document.getElementById("age").value) || 0;
+        const height = parseFloat(document.getElementById("height").value) || 0;
+        const weight = parseFloat(document.getElementById("weight").value) || 0;
+        const activity = parseFloat(document.getElementById("activity").value);
+        const goal = parseFloat(document.getElementById("goal").value);
+
+        if (height <= 0 || weight <= 0 || age <= 0) {
+            document.getElementById("tdee").textContent = "-";
+            document.getElementById("bmrLine").textContent = "키/체중/나이를 입력해주세요";
+            return;
+        }
+
+        const bmr = gender === "male"
+            ? 10 * weight + 6.25 * height - 5 * age + 5
+            : 10 * weight + 6.25 * height - 5 * age - 161;
+
+        const tdee = bmr * activity + goal;
+
+        document.getElementById("tdee").textContent = Math.round(tdee).toLocaleString();
+        document.getElementById("bmrLine").textContent = "기초대사량(BMR) " + Math.round(bmr).toLocaleString() + "kcal";
+
+        const proteinG = weight * 1.8;
+        const fatG = (tdee * 0.25) / 9;
+        const carbG = Math.max(0, (tdee - proteinG * 4 - fatG * 9) / 4);
+
+        document.getElementById("protein").textContent = Math.round(proteinG) + "g";
+        document.getElementById("fat").textContent = Math.round(fatG) + "g";
+        document.getElementById("carb").textContent = Math.round(carbG) + "g";
+    }
+
+    calc();
+</script>
+
+</body>
+</html>

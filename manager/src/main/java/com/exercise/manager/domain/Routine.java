@@ -47,6 +47,37 @@ public class Routine {
         return set;
     }
 
+    // 화면 표시용: 이 운동의 실제 세트 수 (세트별 상세 기록이 있으면 그 개수, 없으면 등록 당시 세트 수)
+    public int getTotalSetsCount() {
+        return !routineSets.isEmpty() ? routineSets.size() : sets;
+    }
+
+    // 화면 표시용: 이 운동의 총 반복 횟수 합 (세트별로 반복이 다를 수 있어서 각 세트의 반복을 다 더함)
+    public int getTotalRepsCount() {
+        if (!routineSets.isEmpty()) {
+            return routineSets.stream().mapToInt(RoutineSet::getReps).sum();
+        }
+        return reps * sets;
+    }
+
+    // 화면 표시용: 이 운동의 총 볼륨(무게 x 반복의 합). 세트별 상세 기록이 있으면 그걸 우선 사용하고,
+    // 아직 없으면 등록 당시의 세트/반복/무게 값으로 계산.
+    public double getVolume() {
+        if (!routineSets.isEmpty()) {
+            return routineSets.stream()
+                    .mapToDouble(s -> s.getWeight() * s.getReps())
+                    .sum();
+        }
+        return weight * reps * sets;
+    }
+
+    // 화면 표시용: 이 운동의 예상 소모 칼로리 (체중 기반 대략치)
+    // 저항운동 MET 6.0 가정 + 세트당 약 1분(운동+휴식) 가정 => kcal = 체중(kg) x 세트수 x 0.1
+    public double getEstimatedCalories(double bodyWeightKg) {
+        if (bodyWeightKg <= 0) return 0;
+        return bodyWeightKg * getTotalSetsCount() * 0.1;
+    }
+
     public List<RoutineSet> getRoutineSets() {
         return routineSets.stream()
                 .sorted(Comparator.comparingInt(RoutineSet::getSetOrder))

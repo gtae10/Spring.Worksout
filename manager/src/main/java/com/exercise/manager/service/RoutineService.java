@@ -57,4 +57,35 @@ public class RoutineService {
         }
         return lastUsed;
     }
+
+    // 운동명별 개인 기록(PR) 계산: 각 세트의 추정 1RM(에플리 공식) 중 가장 높은 값을 그 운동의 PR로 잡음
+    public List<com.exercise.manager.dto.PrEntry> findPersonalRecords(Member member) {
+        java.util.Map<String, com.exercise.manager.dto.PrEntry> best = new java.util.LinkedHashMap<>();
+
+        for (Routine r : routineRepository.findByMember(member)) {
+            if (r.getWorkout() == null) continue;
+
+            if (!r.getRoutineSets().isEmpty()) {
+                for (var s : r.getRoutineSets()) {
+                    updateBest(best, r.getWorkout(), r.getPart(), s.getWeight(), s.getReps());
+                }
+            } else {
+                updateBest(best, r.getWorkout(), r.getPart(), r.getWeight(), r.getReps());
+            }
+        }
+
+        List<com.exercise.manager.dto.PrEntry> result = new java.util.ArrayList<>(best.values());
+        result.sort((a, b) -> Double.compare(b.getEstimatedOneRm(), a.getEstimatedOneRm()));
+        return result;
+    }
+
+    private void updateBest(java.util.Map<String, com.exercise.manager.dto.PrEntry> best,
+                            String workout, String part, double weight, int reps) {
+        if (weight <= 0) return;
+        double est1rm = reps <= 1 ? weight : weight * (1 + reps / 30.0);
+        com.exercise.manager.dto.PrEntry current = best.get(workout);
+        if (current == null || est1rm > current.getEstimatedOneRm()) {
+            best.put(workout, new com.exercise.manager.dto.PrEntry(workout, part, weight, reps, est1rm));
+        }
+    }
 }
