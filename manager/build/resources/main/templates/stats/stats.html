@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>통계</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/layout :: topbar(title='통계', backUrl=@{/member/main})}"></div>
+<div th:replace="~{fragments/layout :: navbar(active='stats')}"></div>
+
+<div class="page">
+
+    <div class="stat-grid" style="margin-top: 14px;">
+        <div class="card" style="text-align:center; padding: 16px 8px;">
+            <div style="font-size:12px; color:var(--text-faint); margin-bottom:6px;">이번 주</div>
+            <div style="font-size:24px; font-weight:800;" th:text="${thisWeekCount}">0</div>
+            <div style="font-size:11px; color:var(--text-faint);">일 운동</div>
+        </div>
+        <div class="card" style="text-align:center; padding: 16px 8px;">
+            <div style="font-size:12px; color:var(--text-faint); margin-bottom:6px;">이번 달</div>
+            <div style="font-size:24px; font-weight:800;" th:text="${thisMonthCount}">0</div>
+            <div style="font-size:11px; color:var(--text-faint);">일 운동</div>
+        </div>
+        <div class="card" style="text-align:center; padding: 16px 8px;">
+            <div style="font-size:12px; color:var(--text-faint); margin-bottom:6px;">전체</div>
+            <div style="font-size:24px; font-weight:800; color:var(--accent);" th:text="${totalCount}">0</div>
+            <div style="font-size:11px; color:var(--text-faint);">일 운동</div>
+        </div>
+    </div>
+
+    <!-- 스트릭 -->
+    <div class="card" style="display:flex; align-items:center; justify-content:space-around; margin-top:12px; padding: 18px 8px;">
+        <div style="text-align:center;">
+            <div style="font-size:28px;">🔥</div>
+            <div style="font-size:22px; font-weight:800; color:var(--accent);" th:text="${currentStreak}">0</div>
+            <div style="font-size:12px; color:var(--text-faint);">연속 운동일</div>
+        </div>
+        <div style="width:1px; height:40px; background:var(--border);"></div>
+        <div style="text-align:center;">
+            <div style="font-size:28px;">🏆</div>
+            <div style="font-size:22px; font-weight:800;" th:text="${longestStreak}">0</div>
+            <div style="font-size:12px; color:var(--text-faint);">최장 기록</div>
+        </div>
+    </div>
+
+    <!-- 이번 달 히트맵 -->
+    <h2 class="section-title" th:text="${currentMonthLabel} + ' 활동'">이번 달 활동</h2>
+    <div class="card">
+        <div class="heatmap-grid">
+            <div th:each="d : ${heatmap}" class="heatmap-cell"
+                 th:classappend="${d.active} ? 'active' : ''"
+                 th:style="${d.isToday} ? 'box-shadow: 0 0 0 2px var(--accent);' : ''"
+                 th:text="${d.day}">1</div>
+        </div>
+    </div>
+
+    <!-- 요일별 패턴 -->
+    <h2 class="section-title">요일별 운동 패턴</h2>
+    <div class="card" style="display:flex; align-items:flex-end; gap:8px; padding: 18px 14px; height:120px;">
+        <div th:each="entry : ${dowFrequency}" style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%; justify-content:flex-end;">
+            <div style="font-size:11px; color:var(--text-faint); margin-bottom:4px;" th:text="${entry.value}">0</div>
+            <div style="width:100%; background:var(--accent); border-radius:6px 6px 0 0; min-height:3px;"
+                 th:style="'height:' + ${entry.value * 100 / maxDowCount} + '%'"></div>
+            <div style="font-size:12px; color:var(--text-dim); margin-top:6px;" th:text="${entry.key}">월</div>
+        </div>
+    </div>
+
+    <!-- 부위별 빈도 -->
+    <h2 class="section-title">부위별 운동 빈도</h2>
+    <div th:if="${#lists.isEmpty(partFrequency)}" class="empty-state">아직 배정된 루틴 기록이 없어요.</div>
+    <div class="card" th:unless="${#lists.isEmpty(partFrequency)}">
+        <div th:each="entry : ${partFrequency}" style="margin-bottom: 12px;">
+            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;">
+                <span th:text="${entry.key}">부위</span>
+                <span style="color:var(--text-faint);" th:text="${entry.value} + '회'">0회</span>
+            </div>
+            <div style="height:8px; background:var(--surface-2); border-radius:999px; overflow:hidden;">
+                <div style="height:100%; background:var(--accent); border-radius:999px;"
+                     th:style="'width:' + ${entry.value * 100 / maxPartCount} + '%'"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 부위 밸런스 경고 -->
+    <div th:if="${!#lists.isEmpty(missingParts)}" class="card" style="border-color: var(--accent); background: var(--accent-soft);">
+        <div style="font-size:13px; font-weight:700; margin-bottom:4px;">⚠ 최근 30일간 안 한 부위가 있어요</div>
+        <div style="font-size:13px; color:var(--text-dim);" th:text="${#strings.listJoin(missingParts, ', ')} + ' 운동이 없었어요'">부위</div>
+    </div>
+
+    <!-- 자주 한 운동 TOP 5 -->
+    <h2 class="section-title">자주 한 운동 TOP 5</h2>
+    <div th:if="${#lists.isEmpty(topExercises)}" class="empty-state">아직 기록이 없어요.</div>
+    <div class="card" style="padding: 4px 12px;" th:unless="${#lists.isEmpty(topExercises)}">
+        <div class="exercise-row" th:each="e : ${topExercises}">
+            <div class="exercise-info">
+                <div class="exercise-name" th:text="${e.key}">운동명</div>
+            </div>
+            <div style="color:var(--text-faint); font-size:13px;" th:text="${e.value} + '회'">0회</div>
+        </div>
+    </div>
+
+    <!-- 개인 기록 TOP 5 -->
+    <h2 class="section-title">개인 기록 TOP 5</h2>
+    <div th:if="${#lists.isEmpty(topPrs)}" class="empty-state">아직 기록이 없어요.</div>
+    <div class="card" style="padding: 4px 12px;" th:unless="${#lists.isEmpty(topPrs)}">
+        <div class="exercise-row" th:each="pr : ${topPrs}">
+            <div class="exercise-info">
+                <div class="exercise-name" th:text="${pr.workout}">운동명</div>
+                <div class="exercise-part" th:text="${pr.reps} + '회 수행'">반복</div>
+            </div>
+            <div style="font-weight:800; color:var(--accent);"
+                 th:text="${#numbers.formatDecimal(pr.weight, 0, 'COMMA', 1, 'POINT')} + 'kg'">0kg</div>
+        </div>
+    </div>
+
+    <!-- 체중 변화 추이 -->
+    <h2 class="section-title">체중 변화 추이</h2>
+    <div th:if="${#lists.isEmpty(weightHistory)}" class="empty-state">
+        아직 체중 기록이 없어요. 프로필에서 체중을 저장하면 여기 그래프로 쌓여요.
+    </div>
+    <div class="card" th:unless="${#lists.isEmpty(weightHistory)}">
+        <div id="weightChart"></div>
+        <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:12px; color:var(--text-faint);">
+            <span id="weightStart">-</span>
+            <span id="weightLatest" style="color:var(--accent); font-weight:700;">-</span>
+        </div>
+    </div>
+
+    <!-- 최근 활동 -->
+    <h2 class="section-title">최근 활동</h2>
+    <div th:if="${#lists.isEmpty(recent)}" class="empty-state">아직 기록이 없어요.</div>
+    <div class="card" style="padding: 4px 12px;" th:unless="${#lists.isEmpty(recent)}">
+        <a class="exercise-row" th:each="c : ${recent}"
+           th:href="@{/calender/detail(date=${c.date})}" style="text-decoration:none;">
+            <div class="exercise-info">
+                <div class="exercise-name" th:text="${c.routineGroup != null ? c.routineGroup.title : '루틴 없음'}">루틴명</div>
+                <div class="exercise-part" th:text="${c.date}">날짜</div>
+            </div>
+        </a>
+    </div>
+
+</div>
+
+<script th:inline="javascript">
+    const weightHistory = /*[[${weightHistory}]]*/ [];
+
+    if (weightHistory.length > 0) {
+        const weights = weightHistory.map(w => w.weight);
+        const min = Math.min(...weights);
+        const max = Math.max(...weights);
+        const range = (max - min) || 1;
+
+        const w = 320, h = 100, pad = 10;
+        const step = weightHistory.length > 1 ? (w - pad * 2) / (weightHistory.length - 1) : 0;
+
+        const points = weightHistory.map((wl, i) => {
+            const x = pad + step * i;
+            const y = h - pad - ((wl.weight - min) / range) * (h - pad * 2);
+            return x + "," + y;
+        }).join(" ");
+
+        document.getElementById("weightChart").innerHTML = `
+            <svg viewBox="0 0 ${w} ${h}" style="width:100%; height:100px;">
+                <polyline points="${points}" fill="none" stroke="#ff4433" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        `;
+
+        document.getElementById("weightStart").textContent = weightHistory[0].date + " · " + weightHistory[0].weight + "kg";
+        const latest = weightHistory[weightHistory.length - 1];
+        document.getElementById("weightLatest").textContent = latest.date + " · " + latest.weight + "kg";
+    }
+</script>
+
+</body>
+</html>

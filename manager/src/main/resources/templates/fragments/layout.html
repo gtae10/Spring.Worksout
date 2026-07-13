@@ -20,7 +20,7 @@
         <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="2"/><path d="M4 9h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <span>기록</span>
     </a>
-    <a href="#" class="nav-item" th:classappend="${active == 'stats'} ? 'active' : ''">
+    <a th:href="@{/stats}" class="nav-item" th:classappend="${active == 'stats'} ? 'active' : ''">
         <svg viewBox="0 0 24 24" fill="none"><path d="M5 19V10M12 19V5M19 19v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <span>통계</span>
     </a>

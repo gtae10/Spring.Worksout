@@ -533,6 +533,35 @@ h1, h2, h3, p { margin: 0; }
 .log-row .exercise-name { font-size: 14px; }
 .log-row .exercise-part { margin-top: 3px; }
 
+/* ---------- 통계 화면 상단 3분할 카드 ---------- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+/* ---------- 통계 화면 월별 히트맵 ---------- */
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+.heatmap-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text-faint);
+  font-size: 11px;
+}
+.heatmap-cell.active {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+}
+
 /* ---------- Routine set detail (routine/routineDetail) ---------- */
 .set-row {
   display: grid;

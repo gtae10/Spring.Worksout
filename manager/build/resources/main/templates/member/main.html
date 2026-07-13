@@ -11,7 +11,7 @@
 
 <div class="topbar">
     <h1 class="topbar-title" th:text="${session.loginMember.name} + '님'">홈</h1>
-    <form action="/logout" method="post" style="margin:0;">
+    <form th:action="@{/logout}" method="post" style="margin:0;">
         <button type="submit" class="topbar-action" style="background:none;border:none;cursor:pointer;">로그아웃</button>
     </form>
 </div>

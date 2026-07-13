@@ -44,8 +44,10 @@ public class SecurityConfig {
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
                         .invalidateHttpSession(true)
-                )
-                .csrf(csrf -> csrf.disable()); // 개발 단계
+                );
+        // CSRF는 Spring Security 기본값(활성화)을 그대로 사용함.
+        // Thymeleaf가 th:action 폼에는 CSRF 히든 필드를 자동으로 넣어주기 때문에
+        // 이 프로젝트의 모든 폼(th:action 기준)은 별도 수정 없이 그대로 동작함.
 
         return http.build();
     }

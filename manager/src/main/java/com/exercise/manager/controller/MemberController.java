@@ -5,6 +5,7 @@ import com.exercise.manager.repository.MemberRepository;
 import com.exercise.manager.service.CalenderService;
 import com.exercise.manager.service.MemberService;
 import com.exercise.manager.service.RoutineGroupService;
+import com.exercise.manager.service.WeightLogService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.nio.charset.StandardCharsets;
@@ -27,17 +32,20 @@ public class MemberController {
     private final MemberRepository memberRepository;
     private final RoutineGroupService routineGroupService;
     private final CalenderService calenderService;
+    private final WeightLogService weightLogService;
 
     public MemberController(PasswordEncoder passwordEncoder,
                             MemberRepository memberRepository,
                             MemberService memberService,
                             RoutineGroupService routineGroupService,
-                            CalenderService calenderService) {
+                            CalenderService calenderService,
+                            WeightLogService weightLogService) {
         this.passwordEncoder = passwordEncoder;
         this.memberRepository = memberRepository;
         this.memberService = memberService;
         this.routineGroupService = routineGroupService;
         this.calenderService = calenderService;
+        this.weightLogService = weightLogService;
     }
 
     @GetMapping("/login")
@@ -85,6 +93,7 @@ public class MemberController {
         if (loginMember == null) return "redirect:/login";
 
         memberService.updateWeight(loginMember, weight);
+        weightLogService.logWeight(loginMember, weight);
         session.setAttribute("loginMember", loginMember); // 세션에 캐시된 회원 정보도 갱신
 
         return "redirect:" + (returnTo != null && !returnTo.isBlank() ? returnTo : "/member/main");
@@ -110,6 +119,7 @@ public class MemberController {
         if (loginMember == null) return "redirect:/login";
 
         memberService.updateProfile(loginMember, name, weight, height);
+        if (weight != null) weightLogService.logWeight(loginMember, weight);
         session.setAttribute("loginMember", loginMember);
         redirectAttributes.addFlashAttribute("saved", true);
 

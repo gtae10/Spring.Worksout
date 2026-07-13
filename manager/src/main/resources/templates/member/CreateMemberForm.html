@@ -18,7 +18,7 @@
         </div>
         <h1 class="auth-title">회원가입</h1>
 
-        <form action="/member/new" method="post">
+        <form th:action="@{/member/new}" method="post">
             <div class="form-group">
                 <label class="form-label">아이디</label>
                 <input class="form-input" type="text" name="id" placeholder="ID를 입력하세요" th:value="${prevId}" required>

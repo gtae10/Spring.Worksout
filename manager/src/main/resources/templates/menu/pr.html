@@ -15,7 +15,7 @@
 <div class="page">
 
     <p class="section-sub" style="margin-top: 14px;">
-        지금까지 등록한 세트 중 운동별로 가장 무거웠던 기록이에요. (에플리 공식 기준 추정 1RM 순)
+        지금까지 등록한 세트 중 운동별로 가장 무거웠던 실제 중량이에요. (반복 횟수와 상관없이 무게 기준)
     </p>
 
     <div th:if="${#lists.isEmpty(prList)}" class="empty-state">
@@ -29,13 +29,12 @@
             </span>
             <div class="exercise-info">
                 <div class="exercise-name" th:text="${pr.workout}">운동명</div>
-                <div class="exercise-part"
-                     th:text="${pr.part} + ' · ' + ${pr.weight} + 'kg × ' + ${pr.reps} + '회'">부위 · 기록</div>
+                <div class="exercise-part" th:text="${pr.part} + ' · ' + ${pr.reps} + '회 수행'">부위 · 반복</div>
             </div>
             <div style="text-align:right;">
-                <div style="font-size:11px; color:var(--text-faint);">추정 1RM</div>
-                <div style="font-weight:800; color:var(--accent);"
-                     th:text="${#numbers.formatDecimal(pr.estimatedOneRm, 0, 'COMMA', 0, 'POINT')} + 'kg'">0kg</div>
+                <div style="font-size:11px; color:var(--text-faint);">최고 중량</div>
+                <div style="font-weight:800; color:var(--accent); font-size:16px;"
+                     th:text="${#numbers.formatDecimal(pr.weight, 0, 'COMMA', 1, 'POINT')} + 'kg'">0kg</div>
             </div>
         </div>
     </div>
